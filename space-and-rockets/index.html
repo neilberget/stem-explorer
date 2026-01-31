@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space & Rockets Explorer 🚀</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .mascot {
+            font-size: 80px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ff6b6b, #ff9068, #feca57, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 10px 0;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.2em;
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #ff9068;
+        }
+
+        .slide p {
+            font-size: 1.3em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #ff6b6b, #ff9068);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .fun-fact {
+            background: rgba(255, 159, 243, 0.2);
+            border-left: 4px solid #ff9ff3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .fun-fact::before {
+            content: "🤯 Mind-Blowing Fact: ";
+            font-weight: bold;
+            color: #ff9ff3;
+        }
+
+        .cool-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .cool-list li {
+            font-size: 1.2em;
+            margin: 15px 0;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .cool-list li::before {
+            position: absolute;
+            left: 0;
+            font-size: 1.5em;
+        }
+
+        .cool-list li:nth-child(1)::before { content: "🌍"; }
+        .cool-list li:nth-child(2)::before { content: "🔥"; }
+        .cool-list li:nth-child(3)::before { content: "⚡"; }
+        .cool-list li:nth-child(4)::before { content: "💨"; }
+        .cool-list li:nth-child(5)::before { content: "🎯"; }
+
+        .interactive-box {
+            background: rgba(255, 144, 104, 0.2);
+            border: 2px dashed #ff9068;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        canvas {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            display: block;
+            margin: 20px auto;
+            background: linear-gradient(to bottom, #0a0a1f 0%, #1a1a3e 100%);
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ff9068);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #ff9068;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #ff9068;
+            cursor: pointer;
+            border: none;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: #ff9068;
+            transform: scale(1.3);
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1em;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 144, 104, 0.3);
+            border-color: #ff9068;
+            transform: translateX(10px);
+        }
+
+        .quiz-option.correct {
+            background: rgba(38, 222, 129, 0.3);
+            border-color: #26de81;
+        }
+
+        .quiz-option.wrong {
+            background: rgba(255, 107, 107, 0.3);
+            border-color: #ff6b6b;
+        }
+
+        .back-link {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .back-link a {
+            color: #ff9068;
+            text-decoration: none;
+            font-size: 1.2em;
+            transition: all 0.3s;
+        }
+
+        .back-link a:hover {
+            color: #feca57;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .slide h2 {
+                font-size: 1.5em;
+            }
+
+            .slide p {
+                font-size: 1.1em;
+            }
+
+            canvas {
+                width: 100% !important;
+                height: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="mascot">🚀</div>
+            <h1>Space & Rockets</h1>
+            <p class="subtitle">Blast off into the cosmos!</p>
+        </header>
+
+        <div class="slide-container">
+            <!-- Slide 1: Introduction -->
+            <div class="slide active">
+                <h2>🌌 Why Go to Space?</h2>
+                <p>Have you ever looked up at the night sky and wondered what's out there? Space is <span class="highlight">HUGE</span> and full of amazing things!</p>
+                
+                <ul class="cool-list">
+                    <li><strong>Earth</strong> is our home, but it's just one tiny planet</li>
+                    <li><strong>The Moon</strong> is Earth's neighbor - only 240,000 miles away!</li>
+                    <li><strong>Mars</strong> might have had life billions of years ago</li>
+                    <li><strong>Stars</strong> are giant balls of fire trillions of miles away</li>
+                    <li><strong>Galaxies</strong> have billions of stars - and there are billions of galaxies!</li>
+                </ul>
+
+                <div class="fun-fact">
+                    If you could drive a car to space going 60 mph, it would only take about 1 hour to get to "space" (62 miles up). But to reach the Moon would take over 6 months of non-stop driving!
+                </div>
+
+                <p>But here's the problem: <span class="highlight">space is really, really far away</span>, and there's no air to breathe! We need rockets to get there.</p>
+            </div>
+
+            <!-- Slide 2: What is a Rocket? -->
+            <div class="slide">
+                <h2>🚀 What Makes a Rocket Fly?</h2>
+                <p>Rockets are like <span class="highlight">super-powered machines</span> that can fly to space. But how do they work?</p>
+                
+                <p>Imagine you're on a skateboard holding a heavy ball. If you throw the ball forward, what happens to you? <span class="highlight">You roll backward!</span></p>
+
+                <p>That's exactly how rockets work! They push gas out the bottom <strong>super fast</strong>, and the rocket shoots up into the sky.</p>
+
+                <div class="fun-fact">
+                    This is called Newton's Third Law: "For every action, there's an equal and opposite reaction." Push something one way, and you go the other way!
+                </div>
+
+                <p>Rockets burn <span class="highlight">fuel</span> (like super-strong gasoline) and mix it with <span class="highlight">oxygen</span>. When they burn together, they create <strong>hot gas</strong> that shoots out the bottom at thousands of miles per hour!</p>
+            </div>
+
+            <!-- Slide 3: Rocket Parts -->
+            <div class="slide">
+                <h2>🔧 Parts of a Rocket</h2>
+                <p>A rocket isn't just one big tube - it has different parts that work together:</p>
+
+                <ul class="cool-list">
+                    <li><strong>Payload</strong> - The important stuff on top (astronauts, satellites, or science equipment)</li>
+                    <li><strong>Fuel Tanks</strong> - Hold the fuel and oxygen (they're HUGE!)</li>
+                    <li><strong>Engines</strong> - Burn the fuel to create thrust (pushing power)</li>
+                    <li><strong>Fins</strong> - Help the rocket fly straight (like a dart!)</li>
+                    <li><strong>Stages</strong> - Parts that fall off when empty to make the rocket lighter</li>
+                </ul>
+
+                <div class="fun-fact">
+                    Most of a rocket is just fuel! The Saturn V rocket that went to the Moon was 85% fuel. Imagine a car that's mostly gas tank with tiny seats!
+                </div>
+
+                <p>Rockets use <span class="highlight">stages</span> because carrying empty fuel tanks is like running a race with heavy boots. Once a stage is empty, it falls away, making the rocket lighter and faster!</p>
+            </div>
+
+            <!-- Slide 4: Interactive Launch -->
+            <div class="slide">
+                <h2>🎮 Launch Your Own Rocket!</h2>
+                <p>Now it's your turn! Adjust the fuel and launch angle to see how high your rocket can go.</p>
+
+                <div class="interactive-box">
+                    <canvas id="rocketCanvas" width="600" height="400"></canvas>
+                    
+                    <div class="slider-container">
+                        <label class="slider-label">Fuel Amount: <span id="fuelValue">50</span>%</label>
+                        <input type="range" id="fuelSlider" min="20" max="100" value="50">
+                    </div>
+
+                    <div class="slider-container">
+                        <label class="slider-label">Launch Angle: <span id="angleValue">90</span>°</label>
+                        <input type="range" id="angleSlider" min="70" max="110" value="90">
+                    </div>
+
+                    <button id="launchBtn">🚀 LAUNCH!</button>
+                    <p id="launchResult" style="margin-top: 15px; font-size: 1.2em;"></p>
+                </div>
+
+                <p><strong>Tip:</strong> Rockets go highest when they launch straight up (90°) with lots of fuel!</p>
+            </div>
+
+            <!-- Slide 5: Famous Missions -->
+            <div class="slide">
+                <h2>🌙 Amazing Space Missions</h2>
+                <p>Humans have done some <span class="highlight">incredible</span> things in space!</p>
+
+                <ul class="cool-list">
+                    <li><strong>Apollo 11 (1969)</strong> - First humans on the Moon! Neil Armstrong said, "That's one small step for man, one giant leap for mankind."</li>
+                    <li><strong>Voyager 1 (1977)</strong> - Still traveling through space after 45+ years! It's now in interstellar space - beyond our solar system!</li>
+                    <li><strong>Mars Rovers</strong> - Robot cars exploring Mars, looking for signs of ancient life</li>
+                    <li><strong>International Space Station</strong> - A house in space where astronauts live for months at a time</li>
+                    <li><strong>SpaceX Starship</strong> - New rocket designed to take people to Mars someday!</li>
+                </ul>
+
+                <div class="fun-fact">
+                    The footprints left by astronauts on the Moon are still there! The Moon has no wind or rain, so they could last for millions of years.
+                </div>
+            </div>
+
+            <!-- Slide 6: Space Challenges -->
+            <div class="slide">
+                <h2>😰 Space is Hard!</h2>
+                <p>Going to space isn't easy. Here are some of the challenges:</p>
+
+                <ul class="cool-list">
+                    <li><strong>No Air</strong> - You can't breathe in space, so you need a spacesuit with oxygen</li>
+                    <li><strong>It's Really Cold</strong> - Space is about -270°F (-170°C) in the shade!</li>
+                    <li><strong>Radiation</strong> - Harmful rays from the Sun can hurt you without Earth's atmosphere to protect you</li>
+                    <li><strong>Speed!</strong> - To stay in orbit, you have to go 17,500 mph (that's 20 times faster than a jet!)</li>
+                    <li><strong>Distance</strong> - It takes 3 days to get to the Moon and 7 months to get to Mars!</li>
+                </ul>
+
+                <div class="fun-fact">
+                    In space, there's no gravity pulling you down. Astronauts float around! They have to strap themselves to their beds to sleep, and their food comes in squeeze tubes or pouches.
+                </div>
+
+                <p>Even with all these challenges, humans keep exploring space because we're <span class="highlight">curious</span> and love to discover new things!</p>
+            </div>
+
+            <!-- Slide 7: Quiz -->
+            <div class="slide">
+                <h2>🧠 Test Your Knowledge!</h2>
+                <p>Let's see what you learned about space and rockets!</p>
+
+                <div id="quiz">
+                    <div class="quiz-question" data-correct="2" style="margin-bottom: 30px;">
+                        <p style="font-size: 1.2em; margin-bottom: 15px;"><strong>Question 1:</strong> How do rockets work?</p>
+                        <div class="quiz-option" data-answer="0">They flap wings like a bird 🐦</div>
+                        <div class="quiz-option" data-answer="1">They use giant fans to blow air 💨</div>
+                        <div class="quiz-option" data-answer="2">They push gas out the bottom really fast 🔥</div>
+                        <div class="quiz-option" data-answer="3">They use magnets to float up ⬆️</div>
+                    </div>
+
+                    <div class="quiz-question" data-correct="1" style="margin-bottom: 30px;">
+                        <p style="font-size: 1.2em; margin-bottom: 15px;"><strong>Question 2:</strong> Why do rockets have stages?</p>
+                        <div class="quiz-option" data-answer="0">To make them look cooler 😎</div>
+                        <div class="quiz-option" data-answer="1">To drop empty fuel tanks and get lighter 🪂</div>
+                        <div class="quiz-option" data-answer="2">To carry more astronauts 👨‍🚀</div>
+                        <div class="quiz-option" data-answer="3">So they can land in different places 🌍</div>
+                    </div>
+
+                    <div class="quiz-question" data-correct="2" style="margin-bottom: 30px;">
+                        <p style="font-size: 1.2em; margin-bottom: 15px;"><strong>Question 3:</strong> Who was the first human on the Moon?</p>
+                        <div class="quiz-option" data-answer="0">Buzz Lightyear 🧸</div>
+                        <div class="quiz-option" data-answer="1">Elon Musk 🚗</div>
+                        <div class="quiz-option" data-answer="2">Neil Armstrong 🌙</div>
+                        <div class="quiz-option" data-answer="3">Albert Einstein 🧠</div>
+                    </div>
+                </div>
+
+                <div id="quizResult" style="margin-top: 30px; text-align: center; font-size: 1.3em;"></div>
+            </div>
+
+            <!-- Final Slide -->
+            <div class="slide">
+                <h2>🎉 You're a Space Explorer!</h2>
+                <p>Great job learning about space and rockets! You now know:</p>
+
+                <ul class="cool-list">
+                    <li>Why rockets push gas out the bottom to fly</li>
+                    <li>The different parts of a rocket and how they work</li>
+                    <li>Famous missions that explored the Moon and beyond</li>
+                    <li>The challenges of traveling in space</li>
+                </ul>
+
+                <div class="fun-fact">
+                    Someday, people might live on Mars or even farther away! Maybe YOU could be one of the first Mars explorers! 🚀
+                </div>
+
+                <p style="text-align: center; margin-top: 30px; font-size: 1.3em;">Keep looking up at the stars and dreaming big! 🌟</p>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="../index.html"><button>← Back to Topics</button></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-dots"></div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevBtn">← Previous</button>
+            <button class="nav-btn" id="nextBtn">Next →</button>
+        </div>
+
+        <div class="back-link">
+            <a href="../index.html">← Back to Topics</a>
+        </div>
+    </div>
+
+    <script>
+        // Slide navigation
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.querySelector('.progress-dots');
+
+        // Create progress dots
+        slides.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.dot');
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            if (n >= slides.length) currentSlide = slides.length - 1;
+            if (n < 0) currentSlide = 0;
+
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            currentSlide--;
+            showSlide(currentSlide);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentSlide++;
+            showSlide(currentSlide);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                currentSlide--;
+                showSlide(currentSlide);
+            } else if (e.key === 'ArrowRight') {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        });
+
+        // Interactive rocket launch
+        const canvas = document.getElementById('rocketCanvas');
+        const ctx = canvas.getContext('2d');
+        const fuelSlider = document.getElementById('fuelSlider');
+        const angleSlider = document.getElementById('angleSlider');
+        const fuelValue = document.getElementById('fuelValue');
+        const angleValue = document.getElementById('angleValue');
+        const launchBtn = document.getElementById('launchBtn');
+        const launchResult = document.getElementById('launchResult');
+
+        let rocket = {
+            x: canvas.width / 2,
+            y: canvas.height - 50,
+            vx: 0,
+            vy: 0,
+            fuel: 50,
+            angle: 90,
+            launched: false
+        };
+
+        fuelSlider.addEventListener('input', (e) => {
+            fuelValue.textContent = e.target.value;
+            rocket.fuel = parseInt(e.target.value);
+            drawRocket();
+        });
+
+        angleSlider.addEventListener('input', (e) => {
+            angleValue.textContent = e.target.value;
+            rocket.angle = parseInt(e.target.value);
+            drawRocket();
+        });
+
+        function drawRocket() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw ground
+            ctx.fillStyle = '#26de81';
+            ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
+
+            // Draw launch pad
+            ctx.fillStyle = '#555';
+            ctx.fillRect(canvas.width/2 - 30, canvas.height - 40, 60, 10);
+
+            if (!rocket.launched) {
+                // Draw rocket
+                ctx.save();
+                ctx.translate(rocket.x, rocket.y);
+                
+                // Adjust for angle (angle of 90 is straight up)
+                const rotateAngle = (90 - rocket.angle) * Math.PI / 180;
+                ctx.rotate(rotateAngle);
+
+                // Rocket body
+                ctx.fillStyle = '#ff6b6b';
+                ctx.fillRect(-15, -40, 30, 50);
+
+                // Rocket nose
+                ctx.beginPath();
+                ctx.moveTo(-15, -40);
+                ctx.lineTo(0, -60);
+                ctx.lineTo(15, -40);
+                ctx.fillStyle = '#ff9068';
+                ctx.fill();
+
+                // Fins
+                ctx.fillStyle = '#feca57';
+                ctx.beginPath();
+                ctx.moveTo(-15, 10);
+                ctx.lineTo(-25, 10);
+                ctx.lineTo(-15, -10);
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(15, 10);
+                ctx.lineTo(25, 10);
+                ctx.lineTo(15, -10);
+                ctx.fill();
+
+                // Window
+                ctx.beginPath();
+                ctx.arc(0, -20, 8, 0, Math.PI * 2);
+                ctx.fillStyle = '#48dbfb';
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            // Draw stars
+            ctx.fillStyle = 'white';
+            for (let i = 0; i < 20; i++) {
+                const x = (i * 37) % canvas.width;
+                const y = (i * 23) % (canvas.height - 100);
+                ctx.fillRect(x, y, 2, 2);
+            }
+        }
+
+        function animateLaunch() {
+            if (!rocket.launched) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw ground
+            ctx.fillStyle = '#26de81';
+            ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
+
+            // Draw stars
+            ctx.fillStyle = 'white';
+            for (let i = 0; i < 20; i++) {
+                const x = (i * 37) % canvas.width;
+                const y = (i * 23) % (canvas.height - 100);
+                ctx.fillRect(x, y, 2, 2);
+            }
+
+            // Update rocket position
+            rocket.y += rocket.vy;
+            rocket.x += rocket.vx;
+            rocket.vy -= 0.5; // Gravity
+
+            // Draw flame
+            if (rocket.y < canvas.height - 100) {
+                ctx.fillStyle = '#feca57';
+                ctx.beginPath();
+                ctx.arc(rocket.x, rocket.y + 10, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ff6b6b';
+                ctx.beginPath();
+                ctx.arc(rocket.x, rocket.y + 10, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw rocket
+            ctx.save();
+            ctx.translate(rocket.x, rocket.y);
+            
+            const rotateAngle = (90 - rocket.angle) * Math.PI / 180;
+            ctx.rotate(rotateAngle);
+
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(-10, -30, 20, 35);
+
+            ctx.beginPath();
+            ctx.moveTo(-10, -30);
+            ctx.lineTo(0, -45);
+            ctx.lineTo(10, -30);
+            ctx.fillStyle = '#ff9068';
+            ctx.fill();
+
+            ctx.fillStyle = '#feca57';
+            ctx.beginPath();
+            ctx.moveTo(-10, 5);
+            ctx.lineTo(-18, 5);
+            ctx.lineTo(-10, -8);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(10, 5);
+            ctx.lineTo(18, 5);
+            ctx.lineTo(10, -8);
+            ctx.fill();
+
+            ctx.restore();
+
+            // Check if rocket is still in view
+            if (rocket.y > -100 && rocket.y < canvas.height + 50 && rocket.x > -50 && rocket.x < canvas.width + 50) {
+                requestAnimationFrame(animateLaunch);
+            } else {
+                // Calculate result
+                const maxHeight = canvas.height - rocket.y;
+                let message = '';
+                if (maxHeight > 350) {
+                    message = '🎉 WOW! You reached space! That was over 100km high!';
+                } else if (maxHeight > 250) {
+                    message = '🚀 Great launch! You went really high!';
+                } else if (maxHeight > 150) {
+                    message = '👍 Good job! Try more fuel or a straighter angle!';
+                } else {
+                    message = '💨 Not bad for a first try! Add more fuel!';
+                }
+                launchResult.textContent = message;
+                rocket.launched = false;
+                setTimeout(() => {
+                    rocket.x = canvas.width / 2;
+                    rocket.y = canvas.height - 50;
+                    drawRocket();
+                }, 2000);
+            }
+        }
+
+        launchBtn.addEventListener('click', () => {
+            if (rocket.launched) return;
+            
+            launchResult.textContent = '';
+            rocket.launched = true;
+            
+            // Calculate velocity based on fuel and angle
+            const power = rocket.fuel / 10;
+            const angleRad = rocket.angle * Math.PI / 180;
+            rocket.vy = -power * Math.sin(angleRad);
+            rocket.vx = power * Math.cos(angleRad);
+            
+            animateLaunch();
+        });
+
+        drawRocket();
+
+        // Quiz
+        const quizQuestions = document.querySelectorAll('.quiz-question');
+        const quizOptions = document.querySelectorAll('.quiz-option');
+        const quizResult = document.getElementById('quizResult');
+        let answersCorrect = 0;
+        let answersTotal = quizQuestions.length;
+        let answeredQuestions = new Set();
+
+        quizOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const question = this.closest('.quiz-question');
+                const questionIndex = Array.from(quizQuestions).indexOf(question);
+                
+                // Don't allow re-answering
+                if (answeredQuestions.has(questionIndex)) return;
+                
+                const correctAnswer = parseInt(question.dataset.correct);
+                const selectedAnswer = parseInt(this.dataset.answer);
+                const options = question.querySelectorAll('.quiz-option');
+
+                // Disable all options for this question
+                options.forEach(opt => {
+                    const ans = parseInt(opt.dataset.answer);
+                    if (ans === correctAnswer) {
+                        opt.classList.add('correct');
+                    }
+                    opt.style.cursor = 'default';
+                });
+
+                if (selectedAnswer === correctAnswer) {
+                    answersCorrect++;
+                } else {
+                    this.classList.add('wrong');
+                }
+
+                answeredQuestions.add(questionIndex);
+
+                // Show results if all answered
+                if (answeredQuestions.size === answersTotal) {
+                    let resultText = '';
+                    if (answersCorrect === answersTotal) {
+                        resultText = '🎉 Perfect score! You\'re a space expert!';
+                    } else if (answersCorrect >= answersTotal - 1) {
+                        resultText = '🌟 Great job! You really know your rockets!';
+                    } else {
+                        resultText = `👍 You got ${answersCorrect} out of ${answersTotal}! Want to review the slides?`;
+                    }
+                    quizResult.textContent = resultText;
+                }
+            });
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>

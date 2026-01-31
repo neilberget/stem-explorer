@@ -112,6 +112,15 @@
             box-shadow: 0 20px 60px rgba(38, 222, 129, 0.2);
         }
 
+        .topic-card.space {
+            border-color: rgba(255, 144, 104, 0.3);
+        }
+
+        .topic-card.space:hover {
+            border-color: #ff9068;
+            box-shadow: 0 20px 60px rgba(255, 144, 104, 0.2);
+        }
+
         .topic-card.coming-soon {
             border-color: rgba(255, 255, 255, 0.1);
             opacity: 0.5;
@@ -143,6 +152,10 @@
             color: #26de81;
         }
 
+        .topic-card.space .card-title {
+            color: #ff9068;
+        }
+
         .card-description {
             font-size: 1.1em;
             color: #b0b0b0;
@@ -170,6 +183,10 @@
 
         .topic-card.circuits .tag {
             background: rgba(38, 222, 129, 0.15);
+        }
+
+        .topic-card.space .tag {
+            background: rgba(255, 144, 104, 0.15);
         }
 
         .card-arrow {
@@ -307,19 +324,19 @@
                 <span class="card-arrow">→</span>
             </a>
 
-            <div class="topic-card coming-soon">
-                <span class="coming-badge">Coming Soon</span>
-                <span class="card-icon">🌌</span>
+            <a href="space-and-rockets/" class="topic-card space">
+                <span class="card-icon">🚀</span>
                 <h2 class="card-title">Space & Rockets</h2>
                 <p class="card-description">
-                    Blast off into the universe! Learn about gravity, orbits, and how rockets escape Earth.
+                    Blast off into the universe! Learn how rockets work, explore famous missions, and launch your own rocket!
                 </p>
                 <div class="card-tags">
                     <span class="tag">🚀 Rockets</span>
-                    <span class="tag">🌍 Orbits</span>
+                    <span class="tag">🌙 Moon</span>
                     <span class="tag">👨‍🚀 Astronauts</span>
                 </div>
-            </div>
+                <span class="card-arrow">→</span>
+            </a>
 
             <div class="topic-card coming-soon">
                 <span class="coming-badge">Coming Soon</span>
