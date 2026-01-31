@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Waves Explorer 📻</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .mascot {
+            font-size: 80px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 10px 0;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.2em;
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #feca57;
+        }
+
+        .slide p {
+            font-size: 1.3em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #ff6b6b, #ff9ff3);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .fun-fact {
+            background: rgba(72, 219, 251, 0.2);
+            border-left: 4px solid #48dbfb;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .fun-fact::before {
+            content: "🤓 Fun Fact: ";
+            font-weight: bold;
+            color: #48dbfb;
+        }
+
+        /* Wave Canvas */
+        .wave-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 200px;
+            border-radius: 10px;
+            background: #0a0a1a;
+        }
+
+        .wave-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .wave-btn {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .wave-btn.am {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .wave-btn.fm {
+            background: linear-gradient(45deg, #48dbfb, #0abde3);
+            color: white;
+        }
+
+        .wave-btn.normal {
+            background: linear-gradient(45deg, #feca57, #ff9f43);
+            color: #333;
+        }
+
+        .wave-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .wave-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        /* Navigation */
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .nav-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            background: linear-gradient(45deg, #a55eea, #8854d0);
+            color: white;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(165, 94, 234, 0.5);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            display: flex;
+            gap: 8px;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .progress-dot.active {
+            background: #feca57;
+            transform: scale(1.3);
+        }
+
+        .progress-dot:hover {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Interactive Elements */
+        .interactive-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 20px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Quiz Styles */
+        .quiz-option {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin: 10px 0;
+            font-size: 1.2em;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(10px);
+        }
+
+        .quiz-option.correct {
+            background: rgba(38, 222, 129, 0.3);
+            border-color: #26de81;
+        }
+
+        .quiz-option.wrong {
+            background: rgba(252, 92, 101, 0.3);
+            border-color: #fc5c65;
+        }
+
+        .quiz-result {
+            font-size: 1.5em;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .quiz-result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        /* Comparison boxes */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 600px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .compare-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .compare-box.am {
+            border: 3px solid #ff6b6b;
+        }
+
+        .compare-box.fm {
+            border: 3px solid #48dbfb;
+        }
+
+        .compare-box h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .compare-box.am h3 {
+            color: #ff6b6b;
+        }
+
+        .compare-box.fm h3 {
+            color: #48dbfb;
+        }
+
+        /* Emoji decorations */
+        .emoji-float {
+            position: fixed;
+            font-size: 30px;
+            opacity: 0.3;
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        /* Cool facts list */
+        .cool-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .cool-list li {
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cool-list li span {
+            font-size: 2em;
+        }
+
+        /* Antenna animation */
+        .antenna-demo {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .antenna {
+            font-size: 100px;
+            display: inline-block;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .waves-animation {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .wave-line {
+            width: 4px;
+            height: 30px;
+            background: #48dbfb;
+            border-radius: 2px;
+            animation: wave-dance 1s infinite;
+        }
+
+        .wave-line:nth-child(2) { animation-delay: 0.1s; }
+        .wave-line:nth-child(3) { animation-delay: 0.2s; }
+        .wave-line:nth-child(4) { animation-delay: 0.3s; }
+        .wave-line:nth-child(5) { animation-delay: 0.4s; }
+        .wave-line:nth-child(6) { animation-delay: 0.5s; }
+        .wave-line:nth-child(7) { animation-delay: 0.6s; }
+
+        @keyframes wave-dance {
+            0%, 100% { height: 30px; }
+            50% { height: 60px; }
+        }
+
+        .celebration {
+            font-size: 3em;
+            text-align: center;
+            animation: celebrate 0.5s infinite;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+    </style>
+</head>
+<body>
+    <a href="../" style="position: absolute; top: 20px; left: 20px; text-decoration: none; color: #a0a0a0; font-size: 1.1em; padding: 10px 20px; background: rgba(255, 255, 255, 0.05); border-radius: 25px; transition: all 0.3s; z-index: 100;">← Back to Topics</a>
+
+    <!-- Floating emojis background -->
+    <div class="emoji-float" style="left: 5%; animation-delay: 0s;">📻</div>
+    <div class="emoji-float" style="left: 25%; animation-delay: 5s;">🌊</div>
+    <div class="emoji-float" style="left: 45%; animation-delay: 10s;">📡</div>
+    <div class="emoji-float" style="left: 65%; animation-delay: 15s;">🎵</div>
+    <div class="emoji-float" style="left: 85%; animation-delay: 3s;">⚡</div>
+
+    <div class="container">
+        <header>
+            <div class="mascot">📻</div>
+            <h1>Radio Waves Explorer</h1>
+            <p class="subtitle">Discover the invisible magic of radio! ✨</p>
+        </header>
+
+        <div class="slide-container">
+            <!-- Slide 1: Welcome -->
+            <div class="slide active" id="slide-1">
+                <h2>👋 Welcome, Radio Builder!</h2>
+                <p>WOW! You built your own FM radio! That's <span class="highlight">super cool</span>! 🎉</p>
+                <p>But have you ever wondered... how does music travel through the air to your radio? 🤔</p>
+                <p>Let's go on an adventure to discover the <span class="highlight">invisible magic</span> of radio waves!</p>
+                
+                <div class="antenna-demo">
+                    <div class="antenna">📡</div>
+                    <div class="waves-animation">
+                        <div class="wave-line"></div>
+                        <div class="wave-line"></div>
+                        <div class="wave-line"></div>
+                        <div class="wave-line"></div>
+                        <div class="wave-line"></div>
+                        <div class="wave-line"></div>
+                        <div class="wave-line"></div>
+                    </div>
+                </div>
+
+                <div class="fun-fact">
+                    Radio waves are zooming through your room RIGHT NOW, carrying hundreds of songs, news, and more!
+                </div>
+            </div>
+
+            <!-- Slide 2: What are waves? -->
+            <div class="slide" id="slide-2">
+                <h2>🌊 What Are Waves?</h2>
+                <p>Before we learn about radio waves, let's understand what a <span class="highlight">wave</span> is!</p>
+                <p>Imagine dropping a rock into a pond. What happens? Ripples spread out in circles! Those ripples are <span class="highlight">waves</span>!</p>
+                
+                <div class="wave-container">
+                    <canvas id="waveCanvas1"></canvas>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Small waves 🌊</span>
+                            <span>Big waves 🌊🌊🌊</span>
+                        </div>
+                        <input type="range" id="waveSize" min="10" max="50" value="30">
+                    </div>
+                    <p style="text-align: center; margin-top: 10px; color: #a0a0a0;">👆 Move the slider to change the wave size!</p>
+                </div>
+
+                <p>Waves have two important parts:</p>
+                <ul class="cool-list">
+                    <li><span>📏</span> <strong>Height (Amplitude)</strong> - How tall the wave is</li>
+                    <li><span>🏃</span> <strong>Speed (Frequency)</strong> - How fast the waves come</li>
+                </ul>
+            </div>
+
+            <!-- Slide 3: Radio Waves -->
+            <div class="slide" id="slide-3">
+                <h2>📻 What Are Radio Waves?</h2>
+                <p>Radio waves are like invisible ocean waves... but they travel through the <span class="highlight">AIR</span>! 🌪️</p>
+                <p>You can't see them, you can't feel them, but they're everywhere! They carry sounds and information through space at the <span class="highlight">speed of light</span>! ⚡</p>
+                
+                <div class="interactive-box">
+                    <p style="font-size: 1.5em;">🎵 → 📡 → 〰️〰️〰️ → 📻 → 🔊</p>
+                    <p style="color: #a0a0a0; margin-top: 10px;">Sound becomes radio waves, then becomes sound again!</p>
+                </div>
+
+                <p>Here's how it works:</p>
+                <ol class="cool-list">
+                    <li><span>1️⃣</span> A radio station turns music into electrical signals</li>
+                    <li><span>2️⃣</span> A big antenna sends these signals out as radio waves</li>
+                    <li><span>3️⃣</span> The waves zoom through the air (even through walls!)</li>
+                    <li><span>4️⃣</span> Your radio's antenna catches them and turns them back into sound!</li>
+                </ol>
+
+                <div class="fun-fact">
+                    Radio waves can travel through walls, which is why you can listen to the radio inside your house!
+                </div>
+            </div>
+
+            <!-- Slide 4: AM vs FM -->
+            <div class="slide" id="slide-4">
+                <h2>🆚 AM vs FM - The Big Difference!</h2>
+                <p>Your radio has <span class="highlight">AM</span> and <span class="highlight">FM</span>. But what's the difference?</p>
+                <p>It's all about HOW we change the wave to carry sound!</p>
+
+                <div class="comparison">
+                    <div class="compare-box am">
+                        <h3>AM Radio</h3>
+                        <p><strong>A</strong>mplitude <strong>M</strong>odulation</p>
+                        <p style="font-size: 2em; margin: 15px 0;">📊</p>
+                        <p>The wave gets <span class="highlight">TALLER</span> and <span class="highlight">SHORTER</span></p>
+                        <p style="color: #a0a0a0; margin-top: 10px;">(Like waves in a bathtub - some big, some small)</p>
+                    </div>
+                    <div class="compare-box fm">
+                        <h3>FM Radio</h3>
+                        <p><strong>F</strong>requency <strong>M</strong>odulation</p>
+                        <p style="font-size: 2em; margin: 15px 0;">🏃‍♂️</p>
+                        <p>The wave gets <span class="highlight">FASTER</span> and <span class="highlight">SLOWER</span></p>
+                        <p style="color: #a0a0a0; margin-top: 10px;">(Like your heartbeat - sometimes fast, sometimes slow)</p>
+                    </div>
+                </div>
+
+                <div class="wave-container">
+                    <canvas id="waveCanvas2"></canvas>
+                    <div class="wave-controls">
+                        <button class="wave-btn normal active" onclick="setWaveType('normal')">Normal Wave 〰️</button>
+                        <button class="wave-btn am" onclick="setWaveType('am')">AM Wave 📊</button>
+                        <button class="wave-btn fm" onclick="setWaveType('fm')">FM Wave 🏃</button>
+                    </div>
+                    <p style="text-align: center; margin-top: 15px; color: #a0a0a0;">👆 Click the buttons to see the difference!</p>
+                </div>
+            </div>
+
+            <!-- Slide 5: AM vs FM Details -->
+            <div class="slide" id="slide-5">
+                <h2>🎯 Why Does It Matter?</h2>
+                
+                <div class="comparison">
+                    <div class="compare-box am">
+                        <h3>AM Radio 📻</h3>
+                        <ul style="text-align: left; list-style: none;">
+                            <li>✅ Travels REALLY far</li>
+                            <li>✅ Goes around mountains</li>
+                            <li>✅ Works at night even better!</li>
+                            <li>❌ Sound quality is not as good</li>
+                            <li>❌ More static and buzzing</li>
+                        </ul>
+                        <p style="margin-top: 15px; color: #a0a0a0;">Best for: Talk radio, news, sports</p>
+                    </div>
+                    <div class="compare-box fm">
+                        <h3>FM Radio 🎵</h3>
+                        <ul style="text-align: left; list-style: none;">
+                            <li>✅ Sounds AMAZING</li>
+                            <li>✅ Less static noise</li>
+                            <li>✅ Perfect for music!</li>
+                            <li>❌ Doesn't travel as far</li>
+                            <li>❌ Mountains can block it</li>
+                        </ul>
+                        <p style="margin-top: 15px; color: #a0a0a0;">Best for: Music stations</p>
+                    </div>
+                </div>
+
+                <div class="fun-fact">
+                    That's why your FM radio that you built plays music so clearly! FM is perfect for hearing all the details in songs! 🎵
+                </div>
+
+                <p>Think of it this way:</p>
+                <p style="font-size: 1.3em; text-align: center; padding: 20px;">
+                    📣 <strong>AM</strong> = Shouting across a big field (goes far, but sounds a bit fuzzy)<br><br>
+                    🎤 <strong>FM</strong> = Talking through a super clear microphone (sounds great, but only nearby)
+                </p>
+            </div>
+
+            <!-- Slide 6: How Your Radio Works -->
+            <div class="slide" id="slide-6">
+                <h2>🔧 How Your Radio Works!</h2>
+                <p>Remember the radio you built? Here's what's happening inside! 🧠</p>
+
+                <div class="interactive-box">
+                    <div style="font-size: 1.5em; line-height: 2.5;">
+                        <p>📡 <strong>Antenna</strong> - Catches radio waves from the air</p>
+                        <p>⬇️</p>
+                        <p>🎛️ <strong>Tuner</strong> - Picks ONE station (when you turn the dial!)</p>
+                        <p>⬇️</p>
+                        <p>⚡ <strong>Amplifier</strong> - Makes the signal stronger</p>
+                        <p>⬇️</p>
+                        <p>🔊 <strong>Speaker</strong> - Turns it back into sound you can hear!</p>
+                    </div>
+                </div>
+
+                <p>When you turn the tuning dial on your radio, you're telling it which radio waves to listen to! Each radio station uses a different <span class="highlight">frequency</span> (like having a different address).</p>
+
+                <div class="fun-fact">
+                    FM stations are numbered like 101.5 or 97.3 - those numbers are the frequency in megahertz (MHz), which means MILLIONS of waves per second! 🤯
+                </div>
+            </div>
+
+            <!-- Slide 7: Cool Facts -->
+            <div class="slide" id="slide-7">
+                <h2>🌟 Mind-Blowing Radio Facts!</h2>
+                
+                <ul class="cool-list">
+                    <li><span>🛸</span> Scientists use radio waves to talk to spacecraft BILLIONS of miles away!</li>
+                    <li><span>📶</span> WiFi is actually radio waves too! So is Bluetooth!</li>
+                    <li><span>🎮</span> Your game controllers use radio waves to talk to your console!</li>
+                    <li><span>👽</span> We're listening for alien radio signals from space! (No luck yet...)</li>
+                    <li><span>🌍</span> The first radio message was sent in 1895 - over 100 years ago!</li>
+                    <li><span>📱</span> Cell phones use radio waves to make calls and texts!</li>
+                    <li><span>🎤</span> Walkie-talkies use radio waves - you've probably used them!</li>
+                </ul>
+
+                <div class="fun-fact">
+                    Radio waves from old TV shows are still traveling through space! An alien 50 light-years away could be watching shows from the 1970s right now! 📺👽
+                </div>
+            </div>
+
+            <!-- Slide 8: Quiz -->
+            <div class="slide" id="slide-8">
+                <h2>🎯 Quiz Time!</h2>
+                <p>Let's see what you learned! Don't worry - it's just for fun! 😊</p>
+
+                <div id="quiz-container">
+                    <div class="quiz-question" id="q1">
+                        <p style="font-size: 1.3em; margin-bottom: 15px;"><strong>1. In FM radio, what changes?</strong></p>
+                        <button class="quiz-option" onclick="checkAnswer(this, false)">🅰️ The wave gets taller and shorter</button>
+                        <button class="quiz-option" onclick="checkAnswer(this, true)">🅱️ The wave gets faster and slower</button>
+                        <button class="quiz-option" onclick="checkAnswer(this, false)">🅲️ The wave changes color</button>
+                    </div>
+
+                    <div class="quiz-question" id="q2" style="display: none;">
+                        <p style="font-size: 1.3em; margin-bottom: 15px;"><strong>2. What does AM stand for?</strong></p>
+                        <button class="quiz-option" onclick="checkAnswer(this, true)">🅰️ Amplitude Modulation</button>
+                        <button class="quiz-option" onclick="checkAnswer(this, false)">🅱️ Amazing Music</button>
+                        <button class="quiz-option" onclick="checkAnswer(this, false)">🅲️ Awesome Microphone</button>
+                    </div>
+
+                    <div class="quiz-question" id="q3" style="display: none;">
+                        <p style="font-size: 1.3em; margin-bottom: 15px;"><strong>3. Which is better for listening to music?</strong></p>
+                        <button class="quiz-option" onclick="checkAnswer(this, false)">🅰️ AM Radio</button>
+                        <button class="quiz-option" onclick="checkAnswer(this, true)">🅱️ FM Radio</button>
+                        <button class="quiz-option" onclick="checkAnswer(this, false)">🅲️ They're exactly the same</button>
+                    </div>
+
+                    <div class="quiz-question" id="q4" style="display: none;">
+                        <p style="font-size: 1.3em; margin-bottom: 15px;"><strong>4. What catches radio waves in your radio?</strong></p>
+                        <button class="quiz-option" onclick="checkAnswer(this, false)">🅰️ The speaker</button>
+                        <button class="quiz-option" onclick="checkAnswer(this, false)">🅱️ The battery</button>
+                        <button class="quiz-option" onclick="checkAnswer(this, true)">🅲️ The antenna</button>
+                    </div>
+
+                    <div class="quiz-question" id="q5" style="display: none;">
+                        <p style="font-size: 1.3em; margin-bottom: 15px;"><strong>5. What else uses radio waves?</strong></p>
+                        <button class="quiz-option" onclick="checkAnswer(this, false)">🅰️ Light bulbs</button>
+                        <button class="quiz-option" onclick="checkAnswer(this, true)">🅱️ WiFi and cell phones</button>
+                        <button class="quiz-option" onclick="checkAnswer(this, false)">🅲️ Water faucets</button>
+                    </div>
+                </div>
+
+                <div class="quiz-result" id="quiz-result"></div>
+            </div>
+
+            <!-- Slide 9: Congratulations -->
+            <div class="slide" id="slide-9">
+                <h2>🎉 You're a Radio Expert!</h2>
+                
+                <div class="celebration">🏆📻🌟</div>
+
+                <p style="font-size: 1.4em; text-align: center; margin: 30px 0;">
+                    Congratulations! You now know how your FM radio works!
+                </p>
+
+                <div class="interactive-box">
+                    <p style="font-size: 1.3em;"><strong>What You Learned:</strong></p>
+                    <ul class="cool-list">
+                        <li><span>✅</span> Waves have height (amplitude) and speed (frequency)</li>
+                        <li><span>✅</span> Radio waves are invisible waves that carry sound</li>
+                        <li><span>✅</span> AM changes wave HEIGHT, FM changes wave SPEED</li>
+                        <li><span>✅</span> FM sounds better, AM goes farther</li>
+                        <li><span>✅</span> Radio waves are everywhere - WiFi, phones, space!</li>
+                    </ul>
+                </div>
+
+                <p style="text-align: center; font-size: 1.3em; margin-top: 20px;">
+                    Keep exploring and building cool things! 🚀<br>
+                    You're going to be an amazing engineer someday! 👷‍♂️
+                </p>
+
+                <p style="text-align: center; margin-top: 30px;">
+                    <a href="../" style="color: #48dbfb; font-size: 1.2em;">🔬 Explore More Topics →</a>
+                </p>
+
+                <div class="fun-fact">
+                    Now when you listen to your FM radio, you'll know the secret magic behind how it works! Pretty cool, right? 😎
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-container">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)" disabled>⬅️ Back</button>
+            <div class="progress" id="progress"></div>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next ➡️</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 9;
+        let quizScore = 0;
+        let currentQuestion = 1;
+        const totalQuestions = 5;
+        let waveType = 'normal';
+
+        // Initialize progress dots
+        function initProgress() {
+            const progress = document.getElementById('progress');
+            for (let i = 1; i <= totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot' + (i === 1 ? ' active' : '');
+                dot.onclick = () => goToSlide(i);
+                progress.appendChild(dot);
+            }
+        }
+
+        function updateProgress() {
+            const dots = document.querySelectorAll('.progress-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index + 1 === currentSlide);
+            });
+        }
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 1 && newSlide <= totalSlides) {
+                goToSlide(newSlide);
+            }
+        }
+
+        function goToSlide(n) {
+            document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+            currentSlide = n;
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+            
+            updateProgress();
+        }
+
+        // Wave animation for slide 2
+        function initWaveCanvas1() {
+            const canvas = document.getElementById('waveCanvas1');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth * 2;
+            canvas.height = 400;
+            
+            let offset = 0;
+            
+            function draw() {
+                const amplitude = parseInt(document.getElementById('waveSize')?.value || 30);
+                
+                ctx.fillStyle = '#0a0a1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.strokeStyle = '#48dbfb';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                
+                for (let x = 0; x < canvas.width; x++) {
+                    const y = canvas.height / 2 + Math.sin((x + offset) * 0.02) * amplitude * 2;
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                
+                ctx.stroke();
+                offset += 2;
+                requestAnimationFrame(draw);
+            }
+            
+            draw();
+        }
+
+        // Wave animation for slide 4 (AM/FM comparison)
+        function initWaveCanvas2() {
+            const canvas = document.getElementById('waveCanvas2');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth * 2;
+            canvas.height = 400;
+            
+            let offset = 0;
+            
+            function draw() {
+                ctx.fillStyle = '#0a0a1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                
+                const baseAmplitude = 60;
+                const baseFrequency = 0.03;
+                
+                for (let x = 0; x < canvas.width; x++) {
+                    let y;
+                    const modulation = Math.sin((x + offset) * 0.005);
+                    
+                    if (waveType === 'normal') {
+                        ctx.strokeStyle = '#feca57';
+                        y = canvas.height / 2 + Math.sin((x + offset) * baseFrequency) * baseAmplitude;
+                    } else if (waveType === 'am') {
+                        ctx.strokeStyle = '#ff6b6b';
+                        const amplitude = baseAmplitude * (1 + modulation * 0.6);
+                        y = canvas.height / 2 + Math.sin((x + offset) * baseFrequency) * amplitude;
+                    } else if (waveType === 'fm') {
+                        ctx.strokeStyle = '#48dbfb';
+                        const frequency = baseFrequency * (1 + modulation * 0.5);
+                        y = canvas.height / 2 + Math.sin((x + offset) * frequency) * baseAmplitude;
+                    }
+                    
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                
+                ctx.stroke();
+                offset += 2;
+                requestAnimationFrame(draw);
+            }
+            
+            draw();
+        }
+
+        function setWaveType(type) {
+            waveType = type;
+            document.querySelectorAll('.wave-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.wave-btn.${type}`).classList.add('active');
+        }
+
+        // Quiz logic
+        function checkAnswer(button, isCorrect) {
+            const options = button.parentElement.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.disabled = true;
+                opt.style.pointerEvents = 'none';
+            });
+            
+            if (isCorrect) {
+                button.classList.add('correct');
+                quizScore++;
+            } else {
+                button.classList.add('wrong');
+                options.forEach(opt => {
+                    if (opt !== button) {
+                        // Find the correct answer
+                        const idx = Array.from(options).indexOf(opt);
+                        if ((currentQuestion === 1 && idx === 1) ||
+                            (currentQuestion === 2 && idx === 0) ||
+                            (currentQuestion === 3 && idx === 1) ||
+                            (currentQuestion === 4 && idx === 2) ||
+                            (currentQuestion === 5 && idx === 1)) {
+                            opt.classList.add('correct');
+                        }
+                    }
+                });
+            }
+            
+            setTimeout(() => {
+                if (currentQuestion < totalQuestions) {
+                    document.getElementById(`q${currentQuestion}`).style.display = 'none';
+                    currentQuestion++;
+                    document.getElementById(`q${currentQuestion}`).style.display = 'block';
+                } else {
+                    showQuizResult();
+                }
+            }, 1500);
+        }
+
+        function showQuizResult() {
+            const result = document.getElementById('quiz-result');
+            let message, bg;
+            
+            if (quizScore === totalQuestions) {
+                message = `🎉 PERFECT SCORE! ${quizScore}/${totalQuestions}! You're a radio genius! 🧠⭐`;
+                bg = 'rgba(38, 222, 129, 0.3)';
+            } else if (quizScore >= 3) {
+                message = `👏 Great job! ${quizScore}/${totalQuestions}! You really know your radio waves! 📻`;
+                bg = 'rgba(72, 219, 251, 0.3)';
+            } else {
+                message = `👍 Nice try! ${quizScore}/${totalQuestions}. Want to go back and learn more? You got this! 💪`;
+                bg = 'rgba(254, 202, 87, 0.3)';
+            }
+            
+            result.innerHTML = message;
+            result.style.background = bg;
+            result.classList.add('show');
+        }
+
+        // Initialize everything
+        window.onload = function() {
+            initProgress();
+            initWaveCanvas1();
+            initWaveCanvas2();
+        };
+
+        // Reinitialize canvases when they become visible
+        const observer = new MutationObserver(() => {
+            if (document.getElementById('slide-2').classList.contains('active')) {
+                initWaveCanvas1();
+            }
+            if (document.getElementById('slide-4').classList.contains('active')) {
+                initWaveCanvas2();
+            }
+        });
+
+        observer.observe(document.querySelector('.slide-container'), {
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
+        // Handle keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            }
+        });
+    </script>
+</body>
+</html>
